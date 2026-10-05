@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LENNI ULTIMATE 2.0 🐰🧋</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  margin: 0;
+  font-family: "Comic Sans MS", cursive;
+  min-height: 100vh;
+  overflow: hidden;
+  background:
+    linear-gradient(
+      120deg,
+      #ffd6e7,
+      #ffe9a8,
+      #c2ffd8,
+      #b8e1ff,
+      #d5c2ff
+    );
+  background-size: 400% 400%;
+  animation: bg 10s ease infinite;
+}
+
+@keyframes bg {
+  0% { background-position: 0 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
+}
+
+/* =========================
+   LAYOUT
+========================= */
+
+#app {
+  display: flex;
+  height: 100vh;
+}
+
+#game {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+#side {
+  width: 330px;
+  padding: 15px;
+  overflow-y: auto;
+  background: rgba(255,255,255,.93);
+  backdrop-filter: blur(12px);
+  border-left: 7px solid #ff70ad;
+  z-index: 20;
+}
+
+/* =========================
+   TITEL
+========================= */
+
+h1 {
+  margin: 0 0 20px;
+  color: white;
+  font-size: 25px;
+  text-align: center;
+  padding: 10px 20px;
+  border-radius: 30px;
+  background: rgba(255,255,255,.25);
+  text-shadow: 0 4px 12px rgba(0,0,0,.25);
+  z-index: 5;
+}
+
+/* =========================
+   CHARAKTERE
+========================= */
+
+#duo {
+  display: flex;
+  gap: 25px;
+  align-items: end;
+  z-index: 5;
+}
+
+.char {
+  font-size: 120px;
+  cursor: pointer;
+  user-select: none;
+  text-align: center;
+  transition: transform .12s;
+  filter: drop-shadow(0 10px 20px rgba(0,0,0,.25));
+}
+
+.char:hover {
+  transform: scale(1.08);
+}
+
+.char:active {
+  transform: scale(.88);
+}
+
+.name {
+  display: block;
+  background: white;
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+/* =========================
+   SCORE
+========================= */
+
+.counter {
+  padding: 16px;
+  border-radius: 20px;
+  background: linear-gradient(90deg,#ff4fa3,#8b6cff);
+  color: white;
+  font-size: 32px;
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.stat {
+  background: white;
+  border-radius: 16px;
+  padding: 10px;
+  margin: 8px 0;
+  text-align: center;
+  font-weight: bold;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+button {
+  width: 100%;
+  border: none;
+  border-radius: 17px;
+  padding: 13px;
+  margin: 5px 0;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform .12s;
+}
+
+button:active {
+  transform: scale(.95);
+}
+
+.shopButton {
+  background: linear-gradient(90deg,#ffe16b,#ff9cd5);
+}
+
+.upgradeButton {
+  background: linear-gradient(90deg,#72e8ff,#9b82ff);
+  color: white;
+}
+
+.prestigeButton {
+  background: linear-gradient(90deg,#ffd700,#ff8c00);
+  color: white;
+}
+
+.starButton {
+  background: linear-gradient(90deg,#152447,#6339a7);
+  color: white;
+}
+
+/* =========================
+   PANELS
+========================= */
+
+.panel {
+  display: none;
+  background: rgba(255,255,255,.98);
+  position: absolute;
+  inset: 30px;
+  z-index: 100;
+  border-radius: 25px;
+  padding: 20px;
+  overflow-y: auto;
+  box-shadow: 0 15px 50px rgba(0,0,0,.3);
+}
+
+.panel.active {
+  display: block;
+}
+
+.panel h2 {
+  text-align: center;
+  margin-top: 0;
+}
+
+.close {
+  background: #ff668f;
+  color: white;
+}
+
+/* =========================
+   SHOP ITEMS
+========================= */
+
+.shopItem {
+  background: #f5f5ff;
+  border-radius: 18px;
+  padding: 15px;
+  margin: 10px 0;
+  text-align: center;
+}
+
+.shopItem .emoji {
+  font-size: 50px;
+}
+
+.shopItem button {
+  background: #ff70ad;
+  color: white;
+}
+
+/* =========================
+   ACHIEVEMENTS
+========================= */
+
+.achievement {
+  padding: 12px;
+  margin: 8px 0;
+  border-radius: 15px;
+  background: #eee;
+}
+
+.achievement.unlocked {
+  background: linear-gradient(90deg,#ffe66d,#ff9ed7);
+}
+
+/* =========================
+   BUBBLES
+========================= */
+
+.bubble {
+  position: absolute;
+  font-size: 38px;
+  pointer-events: none;
+  z-index: 50;
+  animation: bubbleUp .9s forwards;
+}
+
+@keyframes bubbleUp {
+  from {
+    transform: translateY(0) scale(.3);
+    opacity: 1;
+  }
+
+  to {
+    transform:
+      translateY(-220px)
+      translateX(var(--x))
+      scale(1.4);
+    opacity: 0;
+  }
+}
+
+/* =========================
+   FLOATING TEXT
+========================= */
+
+.floatText {
+  position: absolute;
+  pointer-events: none;
+  color: white;
+  font-weight: bold;
+  font-size: 30px;
+  text-shadow: 0 3px 8px #ff3c9d;
+  z-index: 60;
+  animation: floatText 1s forwards;
+}
+
+@keyframes floatText {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(.7);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-100px) scale(1.2);
+  }
+}
+
+/* =========================
+   FLYING TEA
+========================= */
+
+#flyingTea {
+  position: absolute;
+  display: none;
+  font-size: 80px;
+  z-index: 80;
+  pointer-events: none;
+}
+
+@keyframes flyTea {
+  0% {
+    left: -100px;
+    top: 30%;
+    transform: scale(.5) rotate(-20deg);
+  }
+
+  50% {
+    left: 50%;
+    top: 40%;
+    transform: translateX(-50%) scale(1.3) rotate(15deg);
+  }
+
+  100% {
+    left: 50%;
+    top: 45%;
+    transform: translateX(-50%) scale(0);
+    opacity: 0;
+  }
+}
+
+/* =========================
+   STERNE
+========================= */
+
+body.stars {
+  background:
+    radial-gradient(
+      ellipse at bottom,
+      #1b2735,
+      #090a0f
+    );
+  animation: none;
+}
+
+#stars {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  display: none;
+  z-index: 1;
+}
+
+body.stars #stars {
+  display: block;
+}
+
+.star {
+  position: absolute;
+  color: white;
+  animation: twinkle 2s infinite alternate;
+}
+
+@keyframes twinkle {
+  from {
+    opacity: .2;
+    transform: scale(.7);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1.3);
+  }
+}
+
+/* =========================
+   RESET
+========================= */
+
+#reset {
+  background: #ff527e;
+  color: white;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:750px) {
+
+  body {
+    overflow: auto;
+  }
+
+  #app {
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+  }
+
+  #game {
+    height: 65vh;
+    min-height: 500px;
+  }
+
+  #side {
+    width: 100%;
+    height: auto;
+    max-height: 40vh;
+    border-left: none;
+    border-top: 6px solid #ff70ad;
+  }
+
+  .char {
+    font-size: 85px;
+  }
+
+  #duo {
+    gap: 8px;
+  }
+
+  h1 {
+    font-size: 19px;
+  }
+
+  .panel {
+    inset: 10px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div id="app">
+
+<main id="game">
+
+  <div id="stars"></div>
+
+  <h1>
+    LENNI ULTIMATE 2.0 🐰🦫🧋
+  </h1>
+
+  <div id="duo">
+
+    <div class="char" id="lenni">
+      🐰
+      <span class="name">LENNI</span>
+    </div>
+
+    <div class="char" id="biber">
+      🦫
+      <span class="name">BIBER</span>
+    </div>
+
+  </div>
+
+  <div id="flyingTea">🧋</div>
+
+</main>
+
+
+<!-- =========================
+     SEITENLEISTE
+========================= -->
+
+<aside id="side">
+
+  <div class="counter">
+    🧋 <span id="score">0</span>
+  </div>
+
+  <div class="stat">
+    💰 Coins:
+    <span id="coins">0</span>
+  </div>
+
+  <div class="stat">
+    ⚡ Pro Klick:
+    <span id="perClick">1</span>
+  </div>
+
+  <div class="stat">
+    🔥 Combo:
+    <span id="combo">0</span>
+  </div>
+
+  <div class="stat">
+    👑 Prestige:
+    <span id="prestige">0</span>
+  </div>
+
+  <button class="shopButton" onclick="openPanel('shopPanel')">
+    🛒 SHOP
+  </button>
+
+  <button class="upgradeButton" onclick="buyUpgrade()">
+    ⚡ UPGRADE
+  </button>
+
+  <button class="prestigeButton" onclick="prestige()">
+    👑 PRESTIGE
+  </button>
+
+  <button class="starButton" onclick="startStars()">
+    ⭐ STERNENMODUS
+  </button>
+
+  <button onclick="openPanel('achievementPanel')">
+    🏆 ACHIEVEMENTS
+  </button>
+
+  <button id="reset">
+    🔄 RESET
+  </button>
+
+</aside>
+
+</div>
+
+
+<!-- =========================
+     SHOP
+========================= -->
+
+<div class="panel" id="shopPanel">
+
+  <h2>🛒 LENNI SHOP</h2>
+
+  <div class="stat">
+    💰 Coins:
+    <span id="shopCoins">0</span>
+  </div>
+
+  <div class="shopItem">
+    <div class="emoji">🐰</div>
+    <b>Gold-Lenni</b>
+    <p>Der goldene Lenni.</p>
+    <button onclick="buySkin('goldLenni',100)">
+      💰 100 Coins
+    </button>
+  </div>
+
+  <div class="shopItem">
+    <div class="emoji">🦊</div>
+    <b>Fuchs-Skin</b>
+    <p>Lenni wird zum Fuchs.</p>
+    <button onclick="buySkin('fox',250)">
+      💰 250 Coins
+    </button>
+  </div>
+
+  <div class="shopItem">
+    <div class="emoji">🐼</div>
+    <b>Panda-Skin</b>
+    <p>Panda-Modus aktiviert.</p>
+    <button onclick="buySkin('panda',500)">
+      💰 500 Coins
+    </button>
+  </div>
+
+  <div class="shopItem">
+    <div class="emoji">🐲</div>
+    <b>DRACHEN-LENNI</b>
+    <p>Ultra seltener Skin.</p>
+    <button onclick="buySkin('dragon',1000)">
+      💰 1000 Coins
+    </button>
+  </div>
+
+  <button class="close" onclick="closePanels()">
+    ❌ SCHLIESSEN
+  </button>
+
+</div>
+
+
+<!-- =========================
+     ACHIEVEMENTS
+========================= -->
+
+<div class="panel" id="achievementPanel">
+
+  <h2>🏆 ACHIEVEMENTS</h2>
+
+  <div id="achievementList"></div>
+
+  <button class="close" onclick="closePanels()">
+    ❌ SCHLIESSEN
+  </button>
+
+</div>
+
+
+<script>
+
+/* ==========================================
+   SPIELDATEN
+========================================== */
+
+let data = JSON.parse(
+  localStorage.getItem("lenniUltimate2")
+) || {
+
+  score: 0,
+  coins: 0,
+  perClick: 1,
+  combo: 0,
+  prestige: 0,
+  clicks: 0,
+  skin: "normal",
+  ownedSkins: ["normal"]
+
+};
+
+
+/* ==========================================
+   ELEMENTE
+========================================== */
+
+const scoreEl =
+  document.getElementById("score");
+
+const coinsEl =
+  document.getElementById("coins");
+
+const perClickEl =
+  document.getElementById("perClick");
+
+const comboEl =
+  document.getElementById("combo");
+
+const prestigeEl =
+  document.getElementById("prestige");
+
+const shopCoins =
+  document.getElementById("shopCoins");
+
+const lenni =
+  document.getElementById("lenni");
+
+const flyingTea =
+  document.getElementById("flyingTea");
+
+const stars =
+  document.getElementById("stars");
+
+
+/* ==========================================
+   SPEICHERN
+========================================== */
+
+function save() {
+
+  localStorage.setItem(
+    "lenniUltimate2",
+    JSON.stringify(data)
+  );
+
+}
+
+
+/* ==========================================
+   UI
+========================================== */
+
+function updateUI() {
+
+  scoreEl.textContent = data.score;
+
+  coinsEl.textContent = data.coins;
+
+  shopCoins.textContent = data.coins;
+
+  perClickEl.textContent =
+    data.perClick;
+
+  comboEl.textContent =
+    data.combo;
+
+  prestigeEl.textContent =
+    data.prestige;
+
+  updateSkin();
+
+  updateAchievements();
+
+  save();
+}
+
+
+/* ==========================================
+   KLICK
+========================================== */
+
+document
+  .getElementById("duo")
+  .addEventListener("click", clickGame);
+
+
+function clickGame(event) {
+
+  data.clicks++;
+
+  data.combo++;
+
+  let multiplier = 1;
+
+  /* Combo */
+
+  if (data.combo >= 10) {
+    multiplier = 2;
+  }
+
+  if (data.combo >= 25) {
+    multiplier = 3;
+  }
+
+  /* Prestige */
+
+  multiplier +=
+    data.prestige;
+
+  let earned =
+    data.perClick * multiplier;
+
+
+  /* Lucky Click */
+
+  if (Math.random() < 0.05) {
+
+    earned *= 10;
+
+    floatingText(
+      event.clientX,
+      event.clientY,
+      "🍀 LUCKY x10!"
+    );
+
+  } else {
+
+    floatingText(
+      event.clientX,
+      event.clientY,
+      "+" + earned + " 🧋"
+    );
+
+  }
+
+
+  data.score += earned;
+
+  data.coins += earned;
+
+
+  createBubble(
+    event.clientX,
+    event.clientY
+  );
+
+  animateCharacters();
+
+  if (data.clicks % 10 === 0) {
+    flyTea();
+  }
+
+  updateUI();
+
+}
+
+
+/* ==========================================
+   COMBO RESET
+========================================== */
+
+let comboTimer;
+
+document
+  .getElementById("duo")
+  .addEventListener("click", () => {
+
+    clearTimeout(comboTimer);
+
+    comboTimer = setTimeout(() => {
+
+      data.combo = 0;
+
+      updateUI();
+
+    }, 2000);
+
+  });
+
+
+/* ==========================================
+   UPGRADE
+========================================== */
+
+function buyUpgrade() {
+
+  const price =
+    Math.floor(
+      25 * Math.pow(1.6, data.perClick - 1)
+    );
+
+  if (data.coins < price) {
+
+    alert(
+      "💸 Nicht genug Coins!\n\nDu brauchst " +
+      price +
+      " Coins."
+    );
+
+    return;
+  }
+
+  data.coins -= price;
+
+  data.perClick++;
+
+  floatingText(
+    window.innerWidth / 2,
+    window.innerHeight / 2,
+    "⚡ UPGRADE!"
+  );
+
+  updateUI();
+
+}
+
+
+/* ==========================================
+   PRESTIGE
+========================================== */
+
+function prestige() {
+
+  const required =
+    10000 *
+    (data.prestige + 1);
+
+  if (data.score < required) {
+
+    alert(
+      "👑 Noch nicht!\n\n" +
+      "Du brauchst " +
+      required +
+      " Punkte."
+    );
+
+    return;
+  }
+
+  const yes =
+    confirm(
+      "👑 PRESTIGE?\n\n" +
+      "Deine Punkte und Upgrades werden zurückgesetzt.\n" +
+      "Dafür bekommst du einen dauerhaften Bonus!"
+    );
+
+  if (!yes) return;
+
+  data.score = 0;
+  data.coins = 0;
+  data.perClick = 1;
+  data.combo = 0;
+
+  data.prestige++;
+
+  updateUI();
+
+}
+
+
+/* ==========================================
+   SKINS
+========================================== */
+
+function buySkin(name, price) {
+
+  if (data.ownedSkins.includes(name)) {
+
+    data.skin = name;
+
+    updateUI();
+
+    return;
+  }
+
+  if (data.coins < price) {
+
+    alert(
+      "💸 Nicht genug Coins!"
+    );
+
+    return;
+  }
+
+  data.coins -= price;
+
+  data.ownedSkins.push(name);
+
+  data.skin = name;
+
+  updateUI();
+
+}
+
+
+function updateSkin() {
+
+  const skins = {
+
+    normal: "🐰",
+
+    goldLenni: "🐰",
+
+    fox: "🦊",
+
+    panda: "🐼",
+
+    dragon: "🐲"
+
+  };
+
+  lenni.childNodes[0].nodeValue =
+    skins[data.skin] + "\n      ";
+
+}
+
+
+/* ==========================================
+   BUBBLES
+========================================== */
+
+function createBubble(x, y) {
+
+  const bubble =
+    document.createElement("div");
+
+  bubble.className = "bubble";
+
+  const emojis = [
+    "🫧",
+    "🧋",
+    "✨",
+    "💖",
+    "⭐",
+    "🍀"
+  ];
+
+  bubble.textContent =
+    emojis[
+      Math.floor(
+        Math.random() *
+        emojis.length
+      )
+    ];
+
+  bubble.style.left =
+    x + "px";
+
+  bubble.style.top =
+    y + "px";
+
+  bubble.style.setProperty(
+    "--x",
+    (Math.random() * 200 - 100) + "px"
+  );
+
+  document.body.appendChild(bubble);
+
+  setTimeout(
+    () => bubble.remove(),
+    900
+  );
+
+}
+
+
+/* ==========================================
+   FLOATING TEXT
+========================================== */
+
+function floatingText(
+  x,
+  y,
+  text
+) {
+
+  const el =
+    document.createElement("div");
+
+  el.className =
+    "floatText";
+
+  el.textContent =
+    text;
+
+  el.style.left =
+    x + "px";
+
+  el.style.top =
+    y + "px";
+
+  document.body.appendChild(el);
+
+  setTimeout(
+    () => el.remove(),
+    1000
+  );
+
+}
+
+
+/* ==========================================
+   CHARAKTER ANIMATION
+========================================== */
+
+function animateCharacters() {
+
+  const chars =
+    document.querySelectorAll(".char");
+
+  chars.forEach(char => {
+
+    char.style.transform =
+      "scale(1.2) translateY(-10px)";
+
+    setTimeout(() => {
+
+      char.style.transform =
+        "";
+
+    }, 180);
+
+  });
+
+}
+
+
+/* ==========================================
+   FLYING TEA
+========================================== */
+
+function flyTea() {
+
+  flyingTea.style.display =
+    "block";
+
+  flyingTea.style.animation =
+    "none";
+
+  void flyingTea.offsetWidth;
+
+  flyingTea.style.animation =
+    "flyTea 1.5s forwards";
+
+  setTimeout(() => {
+
+    flyingTea.style.display =
+      "none";
+
+  }, 1500);
+
+}
+
+
+/* ==========================================
+   PANELS
+========================================== */
+
+function openPanel(id) {
+
+  closePanels();
+
+  document
+    .getElementById(id)
+    .classList.add("active");
+
+}
+
+
+function closePanels() {
+
+  document
+    .querySelectorAll(".panel")
+    .forEach(panel =>
+      panel.classList.remove("active")
+    );
+
+}
+
+
+/* ==========================================
+   ACHIEVEMENTS
+========================================== */
+
+const achievements = [
+
+  {
+    name: "🧋 Erster Schluck",
+    text: "1 Klick",
+    check: () => data.clicks >= 1
+  },
+
+  {
+    name: "🔥 Klick-Maschine",
+    text: "100 Klicks",
+    check: () => data.clicks >= 100
+  },
+
+  {
+    name: "💰 Reich",
+    text: "1.000 Coins",
+    check: () => data.coins >= 1000
+  },
+
+  {
+    name: "🧋 Bubble-Tea-König",
+    text: "10.000 Punkte",
+    check: () => data.score >= 10000
+  },
+
+  {
+    name: "⚡ Ultra-Klicker",
+    text: "100.000 Punkte",
+    check: () => data.score >= 100000
+  },
+
+  {
+    name: "👑 Prestige",
+    text: "Erstes Prestige",
+    check: () => data.prestige >= 1
+  }
+
+];
+
+
+function updateAchievements() {
+
+  const list =
+    document.getElementById(
+      "achievementList"
+    );
+
+  list.innerHTML = "";
+
+  achievements.forEach(a => {
+
+    const unlocked =
+      a.check();
+
+    const div =
+      document.createElement("div");
+
+    div.className =
+      "achievement " +
+      (unlocked ? "unlocked" : "");
+
+    div.innerHTML =
+      "<b>" +
+      a.name +
+      "</b><br>" +
+      a.text +
+      "<br>" +
+      (unlocked
+        ? "✅ FREIGESCHALTET"
+        : "🔒 Noch gesperrt");
+
+    list.appendChild(div);
+
+  });
+
+}
+
+
+/* ==========================================
+   STERNENMODUS
+========================================== */
+
+let starTimer;
+
+function startStars() {
+
+  if (document.body.classList.contains("stars"))
+    return;
+
+  document.body.classList.add("stars");
+
+  stars.innerHTML = "";
+
+  for (let i = 0; i < 100; i++) {
+
+    const star =
+      document.createElement("div");
+
+    star.className =
+      "star";
+
+    star.textContent =
+      "✦";
+
+    star.style.left =
+      Math.random() * 100 + "%";
+
+    star.style.top =
+      Math.random() * 100 + "%";
+
+    star.style.fontSize =
+      (5 + Math.random() * 12) + "px";
+
+    star.style.animationDelay =
+      Math.random() * 2 + "s";
+
+    stars.appendChild(star);
+
+  }
+
+  let time = 20;
+
+  floatingText(
+    window.innerWidth / 2,
+    100,
+    "⭐ STERNENMODUS!"
+  );
+
+  starTimer =
+    setInterval(() => {
+
+      time--;
+
+      if (time <= 0) {
+
+        clearInterval(starTimer);
+
+        document.body
+          .classList
+          .remove("stars");
+
+        stars.innerHTML = "";
+
+      }
+
+    }, 1000);
+
+}
+
+
+/* ==========================================
+   RESET
+========================================== */
+
+document
+  .getElementById("reset")
+  .addEventListener("click", () => {
+
+    const yes =
+      confirm(
+        "⚠️ Wirklich ALLES löschen?"
+      );
+
+    if (!yes) return;
+
+    localStorage.removeItem(
+      "lenniUltimate2"
+    );
+
+    location.reload();
+
+  });
+
+
+/* ==========================================
+   AUTOSAVE
+========================================== */
+
+setInterval(save, 5000);
+
+
+/* ==========================================
+   START
+========================================== */
+
+updateUI();
+
+</script>
+
+</body>
+</html>
